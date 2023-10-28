@@ -8,7 +8,7 @@ exports.signup = async (req, res) => {
         }
         const userExists = await User.findOne({ where: { email } })
         if(userExists){
-            return res.status(409).json({message:'User Already Exists'});
+            return res.status(409).json({message:'User Already Exists, Please Login'});
         }
         bcrypt.hash(password, 10, async (err, hash) => {
             if (err) {
@@ -21,7 +21,7 @@ exports.signup = async (req, res) => {
                 password: hash,
             })
         })
-        res.status(201).json({ message: 'User Created Successfully' });
+        res.status(201).json({ message: 'Successfully Signed Up' });
     }
     catch (error) {
         console.log('err at signup controller', error);

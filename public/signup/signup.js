@@ -13,7 +13,6 @@ async function signup(event){
         alert(res.data.message);
     }
     catch(error){
-        console.log('err at axios.post',error);
         showError(error);
     }
 }

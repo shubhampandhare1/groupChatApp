@@ -6,7 +6,10 @@ const sequelize = require('./util/db');
 
 const app = express();
 app.use(bodyParser.json({ extended: false }));
-app.use(cors());
+app.use(cors({
+    origin: 'http://127.0.0.1:3001',
+    methods: ['POST', 'GET', 'PUT', 'DELETE'],
+}));
 
 //model
 const User = require('./models/user');
