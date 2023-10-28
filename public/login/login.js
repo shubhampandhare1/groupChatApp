@@ -1,18 +1,15 @@
-const baseUrl = 'http://localhost:3000'
-async function signup(event){
-    try{
+const baseUrl = 'http://localhost:3000';
+async function login(event) {
+    try {
         event.preventDefault();
         const user = {
-            name: event.target.name.value,
             email: event.target.email.value,
-            mobile: event.target.mobile.value,
             password: event.target.password.value,
         }
-        
-        const res = await axios.post(`${baseUrl}/user/signup`, user)
-        alert(res.data.message);
-    }
-    catch(error){
+        const res = await axios.post(`${baseUrl}/user/login`, user)
+
+    } catch (error) {
+        console.log(error);
         showError(error);
     }
 }
