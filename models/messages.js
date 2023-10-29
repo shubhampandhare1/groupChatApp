@@ -13,7 +13,8 @@ const Message = sequelize.define('messages', {
 
     userId:{
         type: Sequelize.INTEGER,
-    }
+    },
+    name: Sequelize.STRING,
 })
 
 module.exports = Message;

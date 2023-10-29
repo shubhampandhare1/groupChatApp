@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const Message  =require('../models/messages');
+const Message = require('../models/messages');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -67,16 +67,26 @@ const generateAccessToken = (id, name) => {
 exports.sendmessage = async (req, res) => {
     try {
         const msg = req.body.msg;
-        
+
         await Message.create({
             msg: msg,
             userId: req.user.id,
+            name: req.user.name,
         })
 
-        res.status(201).json({success: true, message:'Message saved in DB'})
+        res.status(201).json({ success: true, message: 'Message saved in DB' })
 
     } catch (error) {
         console.log(err);
-        res.staus(500).json({success:false, err: error})
+        res.staus(500).json({ success: false, err: error })
+    }
+}
+
+exports.getmessage = async (req, res) => {
+    try {
+        const message = await Message.findAll();
+        res.status(200).json({message: message})
+    } catch (error) {
+        res.status(500).json({success:false, message:'Something Went Wrong in getmessage'})
     }
 }
