@@ -10,6 +10,7 @@ async function login(event) {
 
         const res = await axios.post(`${baseUrl}/user/login`, user);
         alert(res.data.message);
+        window.location.href = '../chat/chat.html';
         localStorage.setItem('token', res.data.token);
 
     } catch (error) {
