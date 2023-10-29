@@ -1,4 +1,5 @@
-const baseUrl = 'http://localhost:3000'
+const baseUrl = 'http://localhost:3000';
+
 async function signup(event){
     try{
         event.preventDefault();
@@ -11,6 +12,7 @@ async function signup(event){
         
         const res = await axios.post(`${baseUrl}/user/signup`, user)
         alert(res.data.message);
+        window.location.href = '../login/login.html';
     }
     catch(error){
         showError(error);

@@ -1,6 +1,8 @@
-const User = require("../models/user");
+const User = require('../models/user');
+const Message  =require('../models/messages');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
 exports.signup = async (req, res) => {
     try {
         const { name, email, mobile, password } = req.body;
@@ -43,7 +45,7 @@ exports.login = async (req, res) => {
                     console.log('error at bcrypt compare', err)
                 }
                 if (result === true) {
-                    res.status(200).json({ message: 'User Login Successful', token:generateAccessToken(userExists[0].id, userExists[0].name) })
+                    res.status(200).json({ message: 'User Login Successful', token: generateAccessToken(userExists[0].id, userExists[0].name) })
                 }
                 else {
                     res.status(401).json({ message: 'User not authorized' });
@@ -60,4 +62,21 @@ exports.login = async (req, res) => {
 
 const generateAccessToken = (id, name) => {
     return jwt.sign({ userId: id, name: name }, process.env.SECRET_KEY);
+}
+
+exports.sendmessage = async (req, res) => {
+    try {
+        const msg = req.body.msg;
+        
+        await Message.create({
+            msg: msg,
+            userId: req.user.id,
+        })
+
+        res.status(201).json({success: true, message:'Message saved in DB'})
+
+    } catch (error) {
+        console.log(err);
+        res.staus(500).json({success:false, err: error})
+    }
 }

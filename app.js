@@ -11,14 +11,20 @@ app.use(cors({
     methods: ['POST', 'GET', 'PUT', 'DELETE'],
 }));
 
-//model
+//models
 const User = require('./models/user');
+const Message = require('./models/messages');
 
 //routes
 const userRoutes = require('./routes/user');
 
 
 app.use('/user', userRoutes);
+
+
+User.hasMany(Message);
+Message.belongsTo(User);
+
 
 sequelize.sync()
     .then(() => {
