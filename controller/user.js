@@ -2,6 +2,7 @@ const User = require('../models/user');
 const Message = require('../models/messages');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Sequelize = require('sequelize');
 
 exports.signup = async (req, res) => {
     try {
@@ -84,7 +85,8 @@ exports.sendmessage = async (req, res) => {
 
 exports.getmessage = async (req, res) => {
     try {
-        const message = await Message.findAll();
+        const chatId = req.params.chatId;
+        const message = await Message.findAll({where:{id:{[Sequelize.Op.gt]:chatId}}});
         res.status(200).json({message: message})
     } catch (error) {
         res.status(500).json({success:false, message:'Something Went Wrong in getmessage'})

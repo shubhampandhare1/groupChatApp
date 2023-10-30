@@ -13,27 +13,40 @@ document.getElementById('sendMsg').addEventListener('click', async () => {
     }
 });
 
-// Get Message
+
 window.addEventListener('DOMContentLoaded', async () => {
     getmessage();
 })
 
-// Get Messages
-function getmessage() {
-    axios.get(`${baseUrl}/user/getmessage`, { headers: { "Authorization": token } })
-        .then((res) => {
-            const data = res.data.message
-            document.getElementById('chats').innerHTML = '';
-            data.forEach(msg => {
-                showMessagesOnScreen(msg);
-            });
+// Function to Get Messages
+async function getmessage() {
+    try {
+        let chats = JSON.parse(localStorage.getItem('chats'));
+        let chatId;
+        if (chats) {
+            if (chats.length > 10) {
+                chats.shift();
+            }
+            chatId = chats[chats.length - 1].id;
+        } else {
+            chatId = 0;
+        }
+        const res = await axios.get(`${baseUrl}/user/getmessage/${chatId}`, { headers: { "Authorization": token } })
+        const allChats = chats.concat(res.data.message);
+
+        localStorage.setItem('chats', JSON.stringify(allChats));
+        document.getElementById('chats').innerHTML = '';
+        allChats.forEach(msg => {
+            showMessagesOnScreen(msg);
         })
-        .catch(err=>console.log(err))
-        .finally(()=>{
-            setTimeout(() => {
-                getmessage();
-            }, 1000);
-        })
+    } catch (error) {
+        console.log('error occured at getmessage',error);
+    }
+    finally {
+        setTimeout(() => {
+            getmessage();
+        }, 1000);
+    }
 }
 
 // Function to show messages on screen
