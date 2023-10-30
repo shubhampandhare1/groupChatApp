@@ -15,16 +15,29 @@ document.getElementById('sendMsg').addEventListener('click', async () => {
 
 // Get Message
 window.addEventListener('DOMContentLoaded', async () => {
-    const messages = await axios.get(`${baseUrl}/user/getmessage`, { headers: { "Authorization": token } });
-    console.log(messages.data.message);
-    const data = messages.data.message;
-    data.forEach(msg => {
-        showMessagesOnScreen(msg)
-    });
+    getmessage();
 })
 
+// Get Messages
+function getmessage() {
+    axios.get(`${baseUrl}/user/getmessage`, { headers: { "Authorization": token } })
+        .then((res) => {
+            const data = res.data.message
+            document.getElementById('chats').innerHTML = '';
+            data.forEach(msg => {
+                showMessagesOnScreen(msg);
+            });
+        })
+        .catch(err=>console.log(err))
+        .finally(()=>{
+            setTimeout(() => {
+                getmessage();
+            }, 1000);
+        })
+}
+
 // Function to show messages on screen
-function showMessagesOnScreen(message){
+function showMessagesOnScreen(message) {
     const chats = document.getElementById('chats');
     const msg = document.createElement('p');
     msg.innerText = `${message.name}: ${message.msg}`;
