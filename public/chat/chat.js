@@ -5,42 +5,56 @@ const token = localStorage.getItem('token');
 document.getElementById('sendMsg').addEventListener('click', async () => {
     try {
         const msg = document.getElementById('msg').value;
-
-        await axios.post(`${baseUrl}/user/sendmessage`, { msg }, { headers: { "Authorization": token } });
+        const groupId = localStorage.getItem('currGroup');
+        await axios.post(`${baseUrl}/user/sendmessage/${groupId}`, { msg }, { headers: { "Authorization": token } });
     }
     catch (error) {
-        console.log(error);
+        console.log('error at send message', error);
     }
 });
 
 
 window.addEventListener('DOMContentLoaded', async () => {
+    localStorage.setItem('chats', JSON.stringify([]));
     getmessage();
+    showGroupsOnReload();
 })
 
 // Function to Get Messages
 async function getmessage() {
     try {
         let chats = JSON.parse(localStorage.getItem('chats'));
-        let chatId;
-        if (chats) {
-            if (chats.length > 10) {
+        const groupId = localStorage.getItem('currGroup');
+        if(!groupId){
+            return;
+        }
+        if (chats.length > 0) {
+            while (chats.length > 10) {
                 chats.shift();
             }
-            chatId = chats[chats.length - 1].id;
-        } else {
-            chatId = 0;
-        }
-        const res = await axios.get(`${baseUrl}/user/getmessage/${chatId}`, { headers: { "Authorization": token } })
-        const allChats = chats.concat(res.data.message);
+            const chatId = chats[chats.length - 1].id;
+            const res = await axios.get(`${baseUrl}/user/getmessage?chatId=${chatId}&groupId=${groupId}`, { headers: { "Authorization": token } })
+            const allChats = chats.concat(res.data.message);
 
-        localStorage.setItem('chats', JSON.stringify(allChats));
-        document.getElementById('chats').innerHTML = '';
-        allChats.forEach(msg => {
-            showMessagesOnScreen(msg);
-        })
+            localStorage.setItem('chats', JSON.stringify(allChats));
+            document.getElementById('chats').innerHTML = '';
+            allChats.forEach(msg => {
+                showMessagesOnScreen(msg);
+            })
+        }
+        else {
+            const res = await axios.get(`${baseUrl}/user/getmessage?chatId=0&groupId=${groupId}`, { headers: { "Authorization": token } })
+
+            const allChats = res.data.message;
+
+            localStorage.setItem('chats', JSON.stringify(allChats));
+            document.getElementById('chats').innerHTML = '';
+            allChats.forEach(msg => {
+                showMessagesOnScreen(msg);
+            })
+        }
     } catch (error) {
-        console.log('error occured at getmessage',error);
+        console.log('error occured at getmessage', error);
     }
     finally {
         setTimeout(() => {
@@ -56,4 +70,70 @@ function showMessagesOnScreen(message) {
     msg.innerText = `${message.name}: ${message.msg}`;
 
     chats.appendChild(msg);
+}
+
+document.getElementById('createGroup').addEventListener('click', () => {
+    document.getElementById('groupForm').style.display = 'block';
+})
+
+document.getElementById('createGroupbtn').addEventListener('click', async () => {
+    try {
+        const groupName = document.getElementById('name').value;
+
+        const res = await axios.post(`${baseUrl}/user/creategroup`, { groupName }, { headers: { "Authorization": token } })
+        // console.log(res)
+        if (res.status == 201) {
+            showGroups(res.data.group);
+        }
+
+    }
+    catch (error) {
+        console.log('error at creating group', error)
+    }
+})
+
+function showGroups(groupData) {
+    document.getElementById('groupForm').style.display = 'none';
+    const group = document.createElement('li');
+    group.id = groupData.id;
+    group.innerHTML = `${groupData.name}`;
+    group.addEventListener('click', () => {
+    
+        location.reload();
+
+        const groupId = group.id;
+
+        localStorage.setItem('currGroup', groupId);
+        document.getElementById('chats').innerHTML = '';
+        getmessage();
+    })
+    document.getElementById('listOfGroups').appendChild(group);
+}
+
+//Add User to group
+document.getElementById('addUserBtn').addEventListener('click', async (event) => {
+    event.preventDefault();
+
+    const email = document.getElementById('addUserEmail').value;
+    const groupId = localStorage.getItem('currGroup');
+
+    axios.post(`${baseUrl}/user/addtogroup/${groupId}`, { email }, { headers: { "Authorization": token } })
+
+        .then((res) => {
+            console.log('User Added to Group')
+        })
+        .catch(error => console.log('err at add user to grp', error))
+})
+
+async function showGroupsOnReload() {
+    try {
+        const res = await axios.get(`${baseUrl}/user/getgroups`, { headers: { "Authorization": token } })
+
+        const groups = res.data.groups;
+        groups.forEach(ele => {
+            showGroups(ele);
+        });
+    } catch (error) {
+        console.log('error at showgrouponreload', error)
+    }
 }

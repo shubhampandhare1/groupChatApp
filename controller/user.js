@@ -1,5 +1,4 @@
-const User = require('../models/user');
-const Message = require('../models/messages');
+const { User, Message, Group, Usergroup } = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Sequelize = require('sequelize');
@@ -63,32 +62,4 @@ exports.login = async (req, res) => {
 
 const generateAccessToken = (id, name) => {
     return jwt.sign({ userId: id, name: name }, process.env.SECRET_KEY);
-}
-
-exports.sendmessage = async (req, res) => {
-    try {
-        const msg = req.body.msg;
-
-        await Message.create({
-            msg: msg,
-            userId: req.user.id,
-            name: req.user.name,
-        })
-
-        res.status(201).json({ success: true, message: 'Message saved in DB' })
-
-    } catch (error) {
-        console.log(err);
-        res.staus(500).json({ success: false, err: error })
-    }
-}
-
-exports.getmessage = async (req, res) => {
-    try {
-        const chatId = req.params.chatId;
-        const message = await Message.findAll({where:{id:{[Sequelize.Op.gt]:chatId}}});
-        res.status(200).json({message: message})
-    } catch (error) {
-        res.status(500).json({success:false, message:'Something Went Wrong in getmessage'})
-    }
 }

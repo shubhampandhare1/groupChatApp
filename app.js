@@ -12,19 +12,29 @@ app.use(cors({
 }));
 
 //models
-const User = require('./models/user');
-const Message = require('./models/messages');
+const { User, Usergroup } = require('./models/user');
+const Group = require('./models/group');
+const Message = require('./models/message');
 
 //routes
 const userRoutes = require('./routes/user');
+const messageRoutes = require('./routes/message');
+const groupRoutes = require('./routes/group');
 
 
 app.use('/user', userRoutes);
+app.use('/user', messageRoutes);
+app.use('/user', groupRoutes);
 
 
 User.hasMany(Message);
 Message.belongsTo(User);
 
+User.belongsToMany(Group, { through: Usergroup });
+Group.belongsToMany(User, { through: Usergroup });
+
+Group.hasMany(Message);
+Message.belongsTo(Group);
 
 sequelize.sync()
     .then(() => {

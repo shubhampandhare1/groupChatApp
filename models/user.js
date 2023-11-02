@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../util/db');
+const Group = require('./group');
 
 const User = sequelize.define('users', {
     id: {
@@ -28,4 +29,21 @@ const User = sequelize.define('users', {
     },
 })
 
-module.exports = User;
+const Usergroup = sequelize.define('usergroups', {
+    userId: {
+        type: Sequelize.INTEGER,
+        refernces: {
+            model: User,
+            key: 'id',
+        }
+    },
+    groupId: {
+        type:Sequelize.INTEGER,
+        refernces: {
+            model: Group,
+            key: 'id',
+        }
+    }
+})
+
+module.exports = { User, Usergroup }

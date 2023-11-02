@@ -6,7 +6,5 @@ const userAuth = require('../middleware/auth');
 
 router.post('/signup', userController.signup);
 router.post('/login', userController.login);
-router.post('/sendmessage', userAuth, userController.sendmessage);
-router.get('/getmessage/:chatId', userAuth, userController.getmessage);
 
 module.exports = router;

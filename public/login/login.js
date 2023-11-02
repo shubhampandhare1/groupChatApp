@@ -20,5 +20,6 @@ async function login(event) {
 }
 
 function showError(error){
-    document.getElementById('error').innerHTML = `<p style="color:red">${error.response.data.message}</p>`
+    console.log(error)
+    document.getElementById('error').innerHTML = `<p style="color:red">${error.message }</p>`
 }
