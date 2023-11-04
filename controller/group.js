@@ -17,7 +17,6 @@ exports.createGroup = async (req, res) => {
         await user.addAdmin(admin);
 
         await group.addAdmin(admin);
-
         res.status(201).json({ success: true, message: 'group created', group: group })
     } catch (error) {
         console.log('err at create group controller', error);
@@ -74,7 +73,7 @@ exports.removeUserFromGroup = async (req, res) => {
 
         const admin = await Admin.findOne({ where: { userId: req.user.id, groupId: groupId, isAdmin: true } });
         const user = await User.findOne({ where: { email: email } });
-        console.log('>>>>>>>>>>>>>>>>>>>>>>', admin);
+        
         if (user.id == req.user.id || (admin.isAdmin == true)) {
 
             const group = await Group.findByPk(groupId);
@@ -174,9 +173,9 @@ exports.isGroupMember = async (req, res) => {
 exports.removeAdmin = async (req, res) => {
     try {
         const groupId = +req.query.groupId;
-        const userId = req.user.id;
+        const userId = +req.query.userId;
 
-        const admin = await Admin.findOne({ where: { userId: userId, groupId: groupId, isAdmin: true } });
+        const admin = await Admin.findOne({ where: { userId: req.user.id, groupId: groupId, isAdmin: true } });
 
         if (admin.isAdmin) {
             await Admin.destroy({ where: { userId: userId, groupId: groupId } })

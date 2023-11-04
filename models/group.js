@@ -11,9 +11,6 @@ const Group = sequelize.define('groups', {
     name: {
         type: Sequelize.STRING,
     },
-    uuid: {
-        type: Sequelize.STRING,
-    }
 })
 
 const Admin = sequelize.define('admins', {
