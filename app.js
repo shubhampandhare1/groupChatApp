@@ -8,7 +8,7 @@ const path = require('path');
 const app = express();
 app.use(bodyParser.json({ extended: false }));
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'http://16.171.111.145:3000',
     methods: ['POST', 'GET', 'PUT', 'DELETE'],
 }));
 
