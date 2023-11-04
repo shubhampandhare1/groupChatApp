@@ -25,7 +25,7 @@ async function getmessage() {
     try {
         let chats = JSON.parse(localStorage.getItem('chats'));
         const groupId = localStorage.getItem('currGroup');
-        if(!groupId){
+        if (!groupId) {
             return;
         }
         if (chats.length > 0) {
@@ -81,7 +81,7 @@ document.getElementById('createGroupbtn').addEventListener('click', async () => 
         const groupName = document.getElementById('name').value;
 
         const res = await axios.post(`${baseUrl}/user/creategroup`, { groupName }, { headers: { "Authorization": token } })
-        // console.log(res)
+        
         if (res.status == 201) {
             showGroups(res.data.group);
         }
@@ -98,7 +98,7 @@ function showGroups(groupData) {
     group.id = groupData.id;
     group.innerHTML = `${groupData.name}`;
     group.addEventListener('click', () => {
-    
+
         location.reload();
 
         const groupId = group.id;
@@ -110,20 +110,6 @@ function showGroups(groupData) {
     document.getElementById('listOfGroups').appendChild(group);
 }
 
-//Add User to group
-document.getElementById('addUserBtn').addEventListener('click', async (event) => {
-    event.preventDefault();
-
-    const email = document.getElementById('addUserEmail').value;
-    const groupId = localStorage.getItem('currGroup');
-
-    axios.post(`${baseUrl}/user/addtogroup/${groupId}`, { email }, { headers: { "Authorization": token } })
-
-        .then((res) => {
-            console.log('User Added to Group')
-        })
-        .catch(error => console.log('err at add user to grp', error))
-})
 
 async function showGroupsOnReload() {
     try {
@@ -137,3 +123,12 @@ async function showGroupsOnReload() {
         console.log('error at showgrouponreload', error)
     }
 }
+
+document.getElementById('settings').addEventListener('click', () => {
+    const currGroup = localStorage.getItem('currGroup');
+    if(!currGroup){
+        alert('Select Group First');
+        return;
+    }
+    window.location.href = '../setting/setting.html';
+})

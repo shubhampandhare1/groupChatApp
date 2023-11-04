@@ -16,4 +16,17 @@ const Group = sequelize.define('groups', {
     }
 })
 
-module.exports = Group;
+const Admin = sequelize.define('admins', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+    },
+    isAdmin: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+    }
+})
+
+module.exports = { Group, Admin }

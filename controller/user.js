@@ -2,6 +2,7 @@ const { User, Message, Group, Usergroup } = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Sequelize = require('sequelize');
+const { Admin } = require('../models/group');
 
 exports.signup = async (req, res) => {
     try {
@@ -62,4 +63,22 @@ exports.login = async (req, res) => {
 
 const generateAccessToken = (id, name) => {
     return jwt.sign({ userId: id, name: name }, process.env.SECRET_KEY);
+}
+
+exports.getAllUsers = async (req, res) => {
+    try {
+
+        const users = await User.findAll({
+            attributes: ['id', 'name', 'email']
+        });
+
+        const userGroups = await Usergroup.findAll({
+            attributes: ['userId', 'groupId']
+        })
+
+        res.status(200).json({ user: users, userGroup: userGroups })
+    }
+    catch (error) {
+        res.status(500).json({ err: error, message: 'Error occured at getAllUsers' })
+    }
 }

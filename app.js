@@ -7,13 +7,13 @@ const sequelize = require('./util/db');
 const app = express();
 app.use(bodyParser.json({ extended: false }));
 app.use(cors({
-    origin: 'http://127.0.0.1:3001',
+    origin: 'http://127.0.0.1:3000',
     methods: ['POST', 'GET', 'PUT', 'DELETE'],
 }));
 
 //models
 const { User, Usergroup } = require('./models/user');
-const Group = require('./models/group');
+const {Group, Admin} = require('./models/group');
 const Message = require('./models/message');
 
 //routes
@@ -35,6 +35,11 @@ Group.belongsToMany(User, { through: Usergroup });
 
 Group.hasMany(Message);
 Message.belongsTo(Group);
+
+User.hasMany(Admin);
+Admin.belongsTo(User);
+Group.hasMany(Admin);
+Admin.belongsTo(Group);
 
 sequelize.sync()
     .then(() => {
