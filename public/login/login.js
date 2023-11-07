@@ -1,4 +1,4 @@
-const baseUrl = 'http://16.171.111.145:3000';
+const baseUrl = 'http://localhost:3000';
 async function login(event) {
     try {
         event.preventDefault();

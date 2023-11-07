@@ -1,8 +1,21 @@
-const baseUrl = 'http://16.171.111.145:3000';
+const baseUrl = 'http://localhost:3000';
 const token = localStorage.getItem('token');
+
+const socket = io(baseUrl);
+const decodedToken = parseJwt(token);
 
 document.addEventListener('DOMContentLoaded', () => {
     getAllUsers();
+
+    socket.on('userAdded', () => {
+        document.getElementById('usersReg').innerHTML = '';
+        getAllUsers();
+    })
+    
+    socket.on('userRemoved', () => {
+        document.getElementById('usersReg').innerHTML = '';
+        getAllUsers();
+    })
 })
 
 // get all users
@@ -46,7 +59,7 @@ function showAllUser(user) {
 
                         .then((res) => {
                             console.log('User Added to Group')
-                            location.reload();
+                            socket.emit('userAdded');
                         })
                         .catch(error => {
                             alert(error.response.data.message)
@@ -73,7 +86,7 @@ function showAllUser(user) {
                     axios.post(`${baseUrl}/user/removeuser/${groupId}`, { email }, { headers: { "Authorization": token } })
                         .then((res) => {
                             console.log('User Removed from Group');
-                            location.reload();
+                            socket.emit('userRemoved');
                         })
                         .catch(error => {
                             alert(error.response.data.message);
@@ -102,7 +115,7 @@ function showAllUser(user) {
                     axios.post(`${baseUrl}/user/makeadmin/${groupId}`, { email }, { headers: { "Authorization": token } })
                         .then((res) => {
                             console.log('You are admin now');
-                            location.reload();
+                            socket.emit('adminAdded')
                         })
                         .catch(error => {
                             alert(error.response.data.message)
@@ -119,7 +132,7 @@ function showAllUser(user) {
                     axios.post(`${baseUrl}/user/removeadmin?groupId=${groupId}&userId=${user.id}`, { email }, { headers: { "Authorization": token } })
                         .then((res) => {
                             console.log('Admin removed');
-                            location.reload();
+                            socket.emit('adminRemoved');
                         })
                         .catch(error => {
                             alert(error.response.data.message)

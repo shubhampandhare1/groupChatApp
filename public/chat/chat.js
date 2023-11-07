@@ -1,18 +1,26 @@
-const baseUrl = 'http://16.171.111.145:3000';
+const baseUrl = 'http://localhost:3000';
 const token = localStorage.getItem('token');
+
+const socket = io(baseUrl);
+const decodedToken = parseJwt(token);
 
 // Send Message
 document.getElementById('sendMsg').addEventListener('click', async () => {
     try {
         const msg = document.getElementById('msg').value;
         const groupId = localStorage.getItem('currGroup');
-        await axios.post(`${baseUrl}/user/sendmessage/${groupId}`, { msg }, { headers: { "Authorization": token } });
+        await axios.post(`${baseUrl}/user/sendmessage/${groupId}`, { msg }, { headers: { "Authorization": token } })
+        socket.emit('send-message', { msg, name: decodedToken.name });
+        document.getElementById('msg').value = '';
     }
     catch (error) {
         console.log('error at send message', error);
     }
 });
 
+socket.on('receive-message', message => {
+    showMessagesOnScreen(message);
+})
 
 window.addEventListener('DOMContentLoaded', async () => {
     localStorage.setItem('chats', JSON.stringify([]));
@@ -56,19 +64,19 @@ async function getmessage() {
     } catch (error) {
         console.log('error occured at getmessage', error);
     }
-    finally {
-        setTimeout(() => {
-            getmessage();
-        }, 1000);
-    }
 }
 
 // Function to show messages on screen
 function showMessagesOnScreen(message) {
     const chats = document.getElementById('chats');
     const msg = document.createElement('p');
-    msg.innerText = `${message.name}: ${message.msg}`;
-
+    if (decodedToken.name == message.name) {
+        msg.innerText = `You: ${message.msg}`;
+        msg.className = 'message curr-user-msg';
+    } else {
+        msg.innerText = `${message.name}: ${message.msg}`;
+        msg.className = 'message other-user-msg';
+    }
     chats.appendChild(msg);
 }
 
@@ -81,7 +89,7 @@ document.getElementById('createGroupbtn').addEventListener('click', async () => 
         const groupName = document.getElementById('name').value;
 
         const res = await axios.post(`${baseUrl}/user/creategroup`, { groupName }, { headers: { "Authorization": token } })
-        
+
         if (res.status == 201) {
             showGroups(res.data.group);
         }
@@ -110,7 +118,6 @@ function showGroups(groupData) {
     document.getElementById('listOfGroups').appendChild(group);
 }
 
-
 async function showGroupsOnReload() {
     try {
         const res = await axios.get(`${baseUrl}/user/getgroups`, { headers: { "Authorization": token } })
@@ -126,9 +133,20 @@ async function showGroupsOnReload() {
 
 document.getElementById('settings').addEventListener('click', () => {
     const currGroup = localStorage.getItem('currGroup');
-    if(!currGroup){
+    if (!currGroup) {
         alert('Select Group First');
         return;
     }
     window.location.href = '../setting/setting.html';
 })
+
+//parse JWT
+function parseJwt(token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
