@@ -6,6 +6,7 @@ const sequelize = require('./util/db');
 const path = require('path');
 const socketIo = require('socket.io');
 const http = require('http');
+const fileUpload = require('express-fileupload');
 
 const app = express();
 
@@ -13,7 +14,9 @@ const server = http.createServer(app);
 
 const io = socketIo(server);
 
-app.use(bodyParser.json({ extended: false }));
+app.use(bodyParser.json({ extended: true }));
+app.use(fileUpload());
+
 app.use(cors({
     origin: 'http://localhost:3000',
     methods: ['POST', 'GET', 'PUT', 'DELETE'],

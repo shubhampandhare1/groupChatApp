@@ -9,9 +9,29 @@ document.getElementById('sendMsg').addEventListener('click', async () => {
     try {
         const msg = document.getElementById('msg').value;
         const groupId = localStorage.getItem('currGroup');
-        await axios.post(`${baseUrl}/user/sendmessage/${groupId}`, { msg }, { headers: { "Authorization": token } })
+
+        if (!msg && !document.getElementById('mediaInput').files[0]) {
+            return;
+        }
+
+        if (document.getElementById('mediaInput').files[0]) {
+            const mediaFile = document.getElementById('mediaInput').files[0];
+            const mediaType = mediaFile.type;
+            const formData = new FormData();
+            formData.append('media', mediaFile);
+            formData.append('mediaType', mediaType);
+            console.log('mediaFile>>>>>', formData)
+
+            await axios.post(`${baseUrl}/user/mediasharing/${groupId}`, formData, {
+                headers: { "Authorization": token, "Content-Type": 'multipart/form-data' }
+            })
+        }
+        if (msg) {
+            await axios.post(`${baseUrl}/user/sendmessage/${groupId}`, { msg }, { headers: { "Authorization": token } })
+        }
         socket.emit('send-message', { msg, name: decodedToken.name });
         document.getElementById('msg').value = '';
+        document.getElementById('mediaInput').value = '';
     }
     catch (error) {
         console.log('error at send message', error);
