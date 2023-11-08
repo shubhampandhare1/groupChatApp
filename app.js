@@ -7,6 +7,8 @@ const path = require('path');
 const socketIo = require('socket.io');
 const http = require('http');
 const fileUpload = require('express-fileupload');
+const cron = require('node-cron');
+const { Op } = require('sequelize');
 
 const app = express();
 
@@ -32,6 +34,7 @@ const userRoutes = require('./routes/user');
 const messageRoutes = require('./routes/message');
 const groupRoutes = require('./routes/group');
 const passwordRoutes = require('./routes/forgotpass');
+const Archivedchats = require('./models/archivedChats');
 
 
 app.use('/user', userRoutes);
@@ -73,7 +76,7 @@ io.on('connection', socket => {
     socket.on('userRemoved', () => {
         io.emit('userRemoved');
     })
-    
+
     socket.on('adminAdded', () => {
         io.emit('adminAdded');
     })
@@ -91,3 +94,26 @@ sequelize.sync()
     .catch(err => {
         console.log('error at sequelize', err)
     })
+
+// const job = new cron('* * * * *', function () {
+//     console.log('This is CRON');
+// });
+
+// job.start();
+
+cron.schedule('* * * * *', function () {
+    console.log('CRON running after every 1 minute');
+    const currDate = new Date();
+
+    const checkDate = `${currDate.getFullYear()}-${(currDate.getMonth() + 1).toString().padStart(2, '0')}-${(currDate.getDate()).toString().padStart(2, '0')}`;
+
+    console.log('checkDate', checkDate);
+    Message.findAll({ where: { createdAt: { [Op.lt]: checkDate } } })
+        .then((allChats) => {
+            allChats.forEach((chat) => {
+                Archivedchats.create(chat.toJSON());
+                chat.destroy();
+            })
+        })
+        .catch(err => console.log('err at cron', err))
+})
