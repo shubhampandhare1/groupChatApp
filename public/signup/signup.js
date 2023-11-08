@@ -1,4 +1,4 @@
-const baseUrl = 'http://localhost:3000';
+const baseUrl = 'http://16.171.64.230:3000';
 
 async function signup(event){
     try{

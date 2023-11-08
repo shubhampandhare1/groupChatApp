@@ -20,7 +20,7 @@ app.use(bodyParser.json({ extended: true }));
 app.use(fileUpload());
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'http://16.171.64.230:3000',
     methods: ['POST', 'GET', 'PUT', 'DELETE'],
 }));
 
@@ -87,7 +87,7 @@ io.on('connection', socket => {
 })
 
 
-sequelize.sync()
+sequelize.sync({ alter: true })
     .then(() => {
         server.listen(3000)
     })
@@ -95,19 +95,12 @@ sequelize.sync()
         console.log('error at sequelize', err)
     })
 
-// const job = new cron('* * * * *', function () {
-//     console.log('This is CRON');
-// });
+cron.schedule('0 0 * * *', function () {
 
-// job.start();
-
-cron.schedule('* * * * *', function () {
-    console.log('CRON running after every 1 minute');
     const currDate = new Date();
 
     const checkDate = `${currDate.getFullYear()}-${(currDate.getMonth() + 1).toString().padStart(2, '0')}-${(currDate.getDate()).toString().padStart(2, '0')}`;
 
-    console.log('checkDate', checkDate);
     Message.findAll({ where: { createdAt: { [Op.lt]: checkDate } } })
         .then((allChats) => {
             allChats.forEach((chat) => {
