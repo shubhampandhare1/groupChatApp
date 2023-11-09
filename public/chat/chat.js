@@ -46,6 +46,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     localStorage.setItem('chats', JSON.stringify([]));
     getmessage();
     showGroupsOnReload();
+    document.getElementById('groupName').textContent = localStorage.getItem('currGname');
 })
 
 // Function to Get Messages
@@ -124,6 +125,7 @@ function showGroups(groupData) {
     document.getElementById('groupForm').style.display = 'none';
     const group = document.createElement('li');
     group.id = groupData.id;
+    group.className = groupData.name;
     group.innerHTML = `${groupData.name}`;
     group.addEventListener('click', () => {
 
@@ -132,6 +134,7 @@ function showGroups(groupData) {
         const groupId = group.id;
 
         localStorage.setItem('currGroup', groupId);
+        localStorage.setItem('currGname', group.className);
         document.getElementById('chats').innerHTML = '';
         getmessage();
     })

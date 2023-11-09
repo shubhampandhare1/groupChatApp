@@ -2,6 +2,7 @@ const Message = require('../models/message');
 const Sequelize = require('sequelize');
 const { Usergroup } = require('../models/user');
 const AWS = require('aws-sdk');
+const { Group } = require('../models/group');
 
 
 exports.sendmessage = async (req, res) => {

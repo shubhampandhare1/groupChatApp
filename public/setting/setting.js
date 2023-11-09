@@ -16,6 +16,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('usersReg').innerHTML = '';
         getAllUsers();
     })
+
+    socket.on('adminAdded', () => {
+        document.getElementById('usersReg').innerHTML = '';
+        getAllUsers();
+    })
+
+    socket.on('adminRemoved', () => {
+        document.getElementById('usersReg').innerHTML = '';
+        getAllUsers();
+    })
 })
 
 // get all users
@@ -128,7 +138,7 @@ function showAllUser(user) {
                 makeAdmin.addEventListener('click', () => {
                     const email = document.getElementById(`${user.email}`).id;
                     const groupId = localStorage.getItem('currGroup');
-                    console.log(groupId, user.id)
+
                     axios.post(`${baseUrl}/user/removeadmin?groupId=${groupId}&userId=${user.id}`, { email }, { headers: { "Authorization": token } })
                         .then((res) => {
                             console.log('Admin removed');

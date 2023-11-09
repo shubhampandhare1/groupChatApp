@@ -87,7 +87,7 @@ io.on('connection', socket => {
 })
 
 
-sequelize.sync({ alter: true })
+sequelize.sync()
     .then(() => {
         server.listen(3000)
     })
