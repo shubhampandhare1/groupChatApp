@@ -1,4 +1,4 @@
-const baseUrl = 'http://16.171.64.230:3000';
+const baseUrl = 'http://localhost:3000';
 const token = localStorage.getItem('token');
 
 const socket = io(baseUrl);
@@ -22,16 +22,18 @@ document.getElementById('sendMsg').addEventListener('click', async () => {
             formData.append('mediaType', mediaType);
             console.log('mediaFile>>>>>', formData)
 
-            await axios.post(`${baseUrl}/user/mediasharing/${groupId}`, formData, {
+            const response = await axios.post(`${baseUrl}/user/mediasharing/${groupId}`, formData, {
                 headers: { "Authorization": token, "Content-Type": 'multipart/form-data' }
             })
+
+            socket.emit('send-message', { msg: response.data.fileUrl, name: decodedToken.name });
+            document.getElementById('mediaInput').value = '';
         }
         if (msg) {
             await axios.post(`${baseUrl}/user/sendmessage/${groupId}`, { msg }, { headers: { "Authorization": token } })
+            socket.emit('send-message', { msg, name: decodedToken.name });
+            document.getElementById('msg').value = '';
         }
-        socket.emit('send-message', { msg, name: decodedToken.name });
-        document.getElementById('msg').value = '';
-        document.getElementById('mediaInput').value = '';
     }
     catch (error) {
         console.log('error at send message', error);
@@ -91,14 +93,33 @@ async function getmessage() {
 function showMessagesOnScreen(message) {
     const chats = document.getElementById('chats');
     const msg = document.createElement('p');
-    if (decodedToken.name == message.name) {
-        msg.innerText = `You: ${message.msg}`;
-        msg.className = 'message curr-user-msg';
-    } else {
-        msg.innerText = `${message.name}: ${message.msg}`;
-        msg.className = 'message other-user-msg';
+
+    if (message.msg) {
+        if (decodedToken.name == message.name) {
+            msg.className = 'message curr-user-msg';
+            if (message.msg.startsWith('http')) {
+
+                const img = document.createElement('img');
+                img.src = message.msg;
+                img.style.width = '250px';
+                msg.appendChild(img);
+            } else {
+                msg.innerText = `You: ${message.msg}`;
+            }
+        } else {
+            msg.className = 'message other-user-msg';
+            if (message.msg.startsWith('http')) {
+
+                const img = document.createElement('img');
+                img.src = message.msg;
+                img.style.width = '250px';
+                msg.appendChild(img);
+            } else {
+                msg.innerText = `${message.name}: ${message.msg}`;
+            }
+        }
+        chats.appendChild(msg);
     }
-    chats.appendChild(msg);
 }
 
 document.getElementById('createGroup').addEventListener('click', () => {

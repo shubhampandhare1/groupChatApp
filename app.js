@@ -20,7 +20,7 @@ app.use(bodyParser.json({ extended: true }));
 app.use(fileUpload());
 
 app.use(cors({
-    origin: 'http://16.171.64.230:3000',
+    origin: 'http://localhost:3000',
     methods: ['POST', 'GET', 'PUT', 'DELETE'],
 }));
 

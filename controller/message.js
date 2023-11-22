@@ -85,8 +85,8 @@ exports.sendMedia = async (req, res) => {
                 name: req.user.name,
                 groupId: groupId,
             })
-
-            res.status(200).json({ success: true, message: 'media saved in db' });
+            
+            res.status(200).json({ success: true, message: 'media saved in db', fileUrl: fileUrl });
         }
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error occured at media saving', err: error })

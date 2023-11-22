@@ -1,4 +1,4 @@
-const baseUrl = 'http://16.171.64.230:3000';
+const baseUrl = 'http://localhost:3000';
 const token = localStorage.getItem('token');
 
 const socket = io(baseUrl);
